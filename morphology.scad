@@ -13,30 +13,31 @@
 //                        - center=true and positive d places the shell centered on the edge
 
 module outset(d=1) {
-	minkowski() {
+	// Bug workaround for older OpenSCAD versions
+	if (version_num() < 20130424) render() outset_extruded(d) child();
+	else minkowski() {
 		circle(r=d);
 		child();
 	}
 }
 
-// Seems to be needed due to a bug(?) with 2D minkowski and complex polygons
 module outset_extruded(d=1) {
-	projection(cut=true) minkowski() {
-		cylinder(r=d);
-		linear_extrude(center=true) child();
-	}
+   projection(cut=true) minkowski() {
+        cylinder(r=d);
+        linear_extrude(center=true) child();
+   }
 }
 
 module inset(d=1) {
-	 inverse() outset_extruded(d=d) inverse() child();
+	 render() inverse() outset(d=d) inverse() child();
 }
 
 module fillet(r=1) {
-	inset(d=r) outset(d=r) child();
+	inset(d=r) render() outset(d=r) child();
 }
 
 module rounding(r=1) {
-	__regenerate_polygon() outset(d=r) inset(d=r) child();
+	outset(d=r) inset(d=r) child();
 }
 
 module shell(d,center=false) {
@@ -65,15 +66,12 @@ module shell(d,center=false) {
 // Below are for internal use only
 
 module inverse() {
-	__regenerate_polygon() difference() {
-		square(1e6,center=true);
+	difference() {
+		square(1e5,center=true);
 		child();
 	}
 }
 
-module __regenerate_polygon() {
-	projection(cut=true) linear_extrude(center=true) child();
-}
 
 // TEST CODE
 
