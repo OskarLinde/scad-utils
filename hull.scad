@@ -25,7 +25,7 @@ len(points) < 3 ? [] : let(
 
 	c = find_first_noncollinear([a,b], points, 2)
 
-) c == len(points) ? [/* all collinear */ ] : let(
+) c == len(points) ? convexhull_collinear(points) : let(
 
 	remaining = [ for (i = [2:len(points)-1]) if (i != c) i ],
 	
@@ -154,6 +154,25 @@ function convex_hull_iterative(points, triangles, planes, remaining, i_=0) = i_ 
 		i_+1
 	);
 
+function convexhull_collinear(points) = let(
+	n = points[1] - points[0],
+	a = points[0],
+	points1d = [ for(p = points) (p-a)*n ],
+	min_i = min_index(points1d),
+	max_i = max_index(points1d)
+) [ min_i, max_i ];
+
+function min_index(values,min_,min_i_,i_) =
+	i_ == undef       ? min_index(values,values[0],0,1) :
+	i_ >= len(values) ? min_i_ :
+	values[i_] < min_ ? min_index(values,values[i_],i_,i_+1)
+	                  : min_index(values,min_,min_i_,i_+1);
+
+function max_index(values,max_,max_i_,i_) =
+	i_ == undef       ? max_index(values,values[0],0,1) :
+	i_ >= len(values) ? max_i_ :
+	values[i_] > max_ ? max_index(values,values[i_],i_,i_+1)
+	                  : max_index(values,max_,max_i_,i_+1);
 
 function remove_elements(array, elements) = [
 	for (i = [0:len(array)-1])
@@ -217,7 +236,7 @@ function area_2d(a,b,c) = (
 	b[0] * (c[1] - a[1]) + 
 	c[0] * (a[1] - b[1])) / 2;
 
-function collinear(a,b,c) = abs(area_2d(a,b,c)) < epsilon*epsilon;
+function collinear(a,b,c) = abs(area_2d(a,b,c)) < epsilon;
 
 function spherical(cartesian) = [
     atan2(cartesian[1], cartesian[0]),
@@ -250,6 +269,9 @@ testpoints_circular = [ for(a = [0:15:360-epsilon]) [cos(a),sin(a)] ];
 
 testpoints_coplanar = let(u = unit([1,3,7]), v = unit([-2,1,-2])) [ for(i = [1:10]) rands(-1,1,1)[0] * u + rands(-1,1,1)[0] * v ];
 
+testpoints_collinear_2d = let(u = unit([5,3]))    [ for(i = [1:20]) rands(-1,1,1)[0] * u ];
+testpoints_collinear_3d = let(u = unit([5,3,-5])) [ for(i = [1:20]) rands(-1,1,1)[0] * u ];
+
 testpoints2d = 20 * [for (i = [1:10]) concat(rands(-1,1,2))];
 testpoints3d = 20 * [for (i = [1:50]) concat(rands(-1,1,3))];
 
@@ -264,6 +286,12 @@ translate([0,50]) visualize_hull(20*testpoints_circular);
 
 // All points 3d but collinear
 translate([0,-50]) visualize_hull(20*testpoints_coplanar);
+
+// Collinear
+translate([50,50]) visualize_hull(20*testpoints_collinear_2d);
+
+// Collinear
+translate([-50,50]) visualize_hull(20*testpoints_collinear_3d);
 
 // 3D points
 visualize_hull(testpoints3d);
