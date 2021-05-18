@@ -10,21 +10,21 @@
 
 module mirror_x() {
 	union() {
-		child();
-		scale([-1,1,1]) child();
+		children(0);
+		scale([-1,1,1]) children(0);
 	}
 }
 
 module mirror_y() {
 	union() {
-		child();
-		scale([1,-1,1]) child();
+		children(0);
+		scale([1,-1,1]) children(0);
 	}
 }
 
 module mirror_z() {
 	union() {
-		child();
-		scale([1,1,-1]) child();
+		children(0);
+		scale([1,1,-1]) children(0);
 	}
 }

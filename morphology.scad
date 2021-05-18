@@ -14,52 +14,52 @@
 
 module outset(d=1) {
 	// Bug workaround for older OpenSCAD versions
-	if (version_num() < 20130424) render() outset_extruded(d) child();
+	if (version_num() < 20130424) render() outset_extruded(d) children(0);
 	else minkowski() {
 		circle(r=d);
-		child();
+		children(0);
 	}
 }
 
 module outset_extruded(d=1) {
    projection(cut=true) minkowski() {
         cylinder(r=d);
-        linear_extrude(center=true) child();
+        linear_extrude(center=true) children(0);
    }
 }
 
 module inset(d=1) {
-	 render() inverse() outset(d=d) inverse() child();
+	 render() inverse() outset(d=d) inverse() children(0);
 }
 
 module fillet(r=1) {
-	inset(d=r) render() outset(d=r) child();
+	inset(d=r) render() outset(d=r) children(0);
 }
 
 module rounding(r=1) {
-	outset(d=r) inset(d=r) child();
+	outset(d=r) inset(d=r) children(0);
 }
 
 module shell(d,center=false) {
 	if (center && d > 0) {
 		difference() {
-			outset(d=d/2) child();
-			inset(d=d/2) child();
+			outset(d=d/2) children(0);
+			inset(d=d/2) children(0);
 		}
 	}
 	if (!center && d > 0) {
 		difference() {
-			outset(d=d) child();
-			child();
+			outset(d=d) children(0);
+			children(0);
 		}
 	}
 	if (!center && d < 0) {
 		difference() {
-			child();
-			inset(d=-d) child();
+			children(0);
+			inset(d=-d) children(0);
 		}
 	}
-	if (d == 0) child();
+	if (d == 0) children(0);
 }
 
 
@@ -68,7 +68,7 @@ module shell(d,center=false) {
 module inverse() {
 	difference() {
 		square(1e5,center=true);
-		child();
+		children(0);
 	}
 }
 
