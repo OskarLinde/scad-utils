@@ -306,7 +306,9 @@ module visualize_hull(points) {
 	else
 		polyhedron(points=points, faces = [hull]);
 	
-	for (i = [0:len(points)-1]) assign(p = points[i], $fn = 16) {
+	for (i = [0:len(points)-1]) {
+		p = points[i];
+		$fn = 16;
 		translate(p) {
 			if (hull_contains_index(hull,i)) {
 				color("blue") sphere(1);
